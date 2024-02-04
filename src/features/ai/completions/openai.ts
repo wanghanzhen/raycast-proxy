@@ -73,7 +73,8 @@ export async function OpenaiChatCompletion(request: FastifyRequest, reply: Fasti
     try {
       for await (const data of events) {
         const res = {
-          text: data.choices[0]?.delta?.content,
+          text: data.choices[0]?.delta?.content || '',
+          finish_reason: null,
         }
         yield { data: JSON.stringify(res) }
       }
@@ -82,7 +83,7 @@ export async function OpenaiChatCompletion(request: FastifyRequest, reply: Fasti
       console.error('Error: ', e.message)
       const res = {
         text: '',
-        finish_reason: e.message,
+        finish_reason: e.message || '',
       }
       yield { data: JSON.stringify(res) }
     }
