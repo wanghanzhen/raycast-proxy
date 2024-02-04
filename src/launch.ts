@@ -12,7 +12,7 @@ fastify.register(FastifySSEPlugin)
 
 const prefix = '/api/v1'
 
-fastify.register(MeRoute, { prefix: `${prefix}/me` })
+// fastify.register(MeRoute, { prefix: `${prefix}/me` })
 fastify.register(AIRoute, { prefix: `${prefix}/ai` })
 
 fastify.get('/', async (_request, _reply) => {

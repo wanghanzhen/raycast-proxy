@@ -1,13 +1,13 @@
-import OpenAI from 'openai'
+import { AzureKeyCredential, OpenAIClient } from '@azure/openai'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { getAIConfig } from '../../../utils/env.util'
 
-const openai = new OpenAI({
-  baseURL: getAIConfig().type === 'custom' ? getAIConfig().endpoint : undefined,
-  apiKey: getAIConfig().key,
-})
+const azureOpenai = new OpenAIClient(
+  'https://volare2.openai.azure.com/',
+  new AzureKeyCredential('8b9313f1e69143aca0c19a1fe0aede27'),
+)
 
-export async function GeminiChatCompletion(request: FastifyRequest, reply: FastifyReply) {
+export async function OpenaiChatCompletion(request: FastifyRequest, reply: FastifyReply) {
   const body = request.body as {
     additional_system_instructions: string
     temperature: number
@@ -66,22 +66,14 @@ export async function GeminiChatCompletion(request: FastifyRequest, reply: Fasti
     if ('temperature' in message.content)
       temperature = message.content.temperature
   }
-  const model = messages[0].content.model
-  const stream = await openai.chat.completions.create({
-    stream: true,
-    messages: openai_message as any,
-    model: model as any,
-    temperature,
-    stop: null,
-    n: 1,
-    max_tokens: getAIConfig().max_tokens ? Number(getAIConfig().max_tokens) : undefined,
-  })
 
-  return reply.sse((async function * source() {
+  const events = await azureOpenai.streamChatCompletions('hz-gpt4-preview', openai_message as any, { temperature, maxTokens: getAIConfig().max_tokens ? Number(getAIConfig().max_tokens) : undefined })
+
+  return reply.sse((async function* source() {
     try {
-      for await (const data of stream) {
+      for await (const data of events) {
         const res = {
-          text: data.choices[0].delta.content,
+          text: data.choices[0]?.delta?.content,
         }
         yield { data: JSON.stringify(res) }
       }

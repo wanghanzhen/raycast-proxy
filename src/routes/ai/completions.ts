@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { getAIConfig } from '../../utils/env.util'
-import { GeminiChatCompletion } from '../../features/ai/completions'
+import { GeminiChatCompletion, OpenaiChatCompletion } from '../../features/ai/completions'
 
 export function Completions(request: FastifyRequest, reply: FastifyReply) {
   const config = getAIConfig()
@@ -8,7 +8,7 @@ export function Completions(request: FastifyRequest, reply: FastifyReply) {
     case 'gemini':
       return GeminiChatCompletion(request, reply)
     case 'openai':
-      break
+      return OpenaiChatCompletion(request, reply)
     default:
       break
   }
