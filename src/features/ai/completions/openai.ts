@@ -3,8 +3,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import { getAIConfig } from '../../../utils/env.util'
 
 const azureOpenai = new OpenAIClient(
-  'https://volare2.openai.azure.com/',
-  new AzureKeyCredential('8b9313f1e69143aca0c19a1fe0aede27'),
+  'https://volarej.openai.azure.com',
+  new AzureKeyCredential('96b13b33815f421889396a6a0d25f8ea'),
 )
 
 export async function OpenaiChatCompletion(request: FastifyRequest, reply: FastifyReply) {
@@ -67,7 +67,7 @@ export async function OpenaiChatCompletion(request: FastifyRequest, reply: Fasti
       temperature = message.content.temperature
   }
 
-  const events = await azureOpenai.streamChatCompletions('hz-gpt4-preview', openai_message as any, { temperature, maxTokens: getAIConfig().max_tokens ? Number(getAIConfig().max_tokens) : undefined })
+  const events = await azureOpenai.streamChatCompletions('hz-gpt4', openai_message as any, { temperature, maxTokens: getAIConfig().max_tokens ? Number(getAIConfig().max_tokens) : undefined })
 
   return reply.sse((async function* source() {
     try {
